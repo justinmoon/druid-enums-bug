@@ -8,5 +8,6 @@ edition = "2018"
 
 [dependencies]
 druid-enums = { git = "https://github.com/Finnerale/druid-enums.git" }
-druid = { git = "https://github.com/justinmoon/druid", branch = "view-switcher" }
+# druid = { git = "https://github.com/justinmoon/druid", branch = "view-switcher" }
+druid = "0.6"
 log = "0.4.11"

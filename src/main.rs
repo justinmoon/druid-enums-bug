@@ -32,13 +32,6 @@ impl AppDelegate<AppState> for Delegate {
     }
 }
 
-#[derive(Clone, Data, Matcher)]
-#[matcher(matcher_name = App)] // defaults to AppStateMatcher
-enum OverlayState {
-    Count(CountState),
-    None,
-}
-
 #[derive(Clone, Data, Lens)]
 struct AppState {
     overlay: OverlayState,
@@ -47,13 +40,20 @@ struct AppState {
 impl AppState {
     fn new() -> Self {
         Self {
-            overlay: OverlayState::None,
-            //overlay: OverlayState::Count(CountState { count: 0 }),
+            //overlay: OverlayState::None,
+            overlay: OverlayState::Count(CountState { count: 0 }),
         }
     }
 }
 
-#[derive(Clone, Data, Lens, Default)]
+#[derive(PartialEq, Clone, Data, Matcher)]
+#[matcher(matcher_name = App)] // defaults to AppStateMatcher
+enum OverlayState {
+    Count(CountState),
+    None,
+}
+
+#[derive(PartialEq, Clone, Data, Lens, Default)]
 struct CountState {
     count: u32,
 }
