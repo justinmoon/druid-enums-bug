@@ -1,6 +1,6 @@
 use druid::{
-    widget::{Button, Controller, Flex, ViewSwitcher},
-    AppDelegate, AppLauncher, Command, Data, DelegateCtx, Env, Event, EventCtx, ExtEventSink, Lens,
+    widget::{Button, Controller, Flex, Label, ViewSwitcher},
+    AppDelegate, AppLauncher, Command, Data, DelegateCtx, Env, Event, EventCtx, Lens,
     PlatformError, Selector, Target, Widget, WidgetExt, WindowDesc,
 };
 use druid_enums::Matcher;
@@ -19,7 +19,7 @@ impl AppDelegate<AppState> for Delegate {
         data: &mut AppState,
         _env: &Env,
     ) -> bool {
-        println!("delegate: {:?}", cmd);
+        //println!("delegate: {:?}", cmd);
         if let Some(_) = cmd.get(CLOSE) {
             data.overlay = OverlayState::None;
             true
@@ -40,14 +40,14 @@ struct AppState {
 impl AppState {
     fn new() -> Self {
         Self {
-            //overlay: OverlayState::None,
-            overlay: OverlayState::Count(CountState { count: 0 }),
+            overlay: OverlayState::None,
+            //overlay: OverlayState::Count(CountState { count: 0 }),
         }
     }
 }
 
 #[derive(PartialEq, Clone, Data, Matcher)]
-#[matcher(matcher_name = App)] // defaults to AppStateMatcher
+#[matcher(matcher_name = Overlay)]
 enum OverlayState {
     Count(CountState),
     None,
@@ -62,8 +62,6 @@ fn main() -> Result<(), PlatformError> {
     let window = WindowDesc::new(ui).title("Druid Enums");
     let state = AppState::new();
     let launcher = AppLauncher::with_window(window);
-
-    //let delegate = Delegate { sink: sink.clone() };
 
     launcher
         .delegate(Delegate)
@@ -84,18 +82,26 @@ fn ui() -> impl Widget<AppState> {
 }
 
 fn overlay_ui() -> impl Widget<OverlayState> {
-    // AppState::matcher() or
-    App::new().count(count_ui()).controller(OverlayController)
+    Overlay::new()
+        .count(count_ui())
+        .controller(OverlayController)
 }
 
 fn page_ui() -> impl Widget<AppState> {
-    Flex::column().with_child(
-        Button::new("Count").on_click(|ctx, _: &mut AppState, _| ctx.submit_command(COUNT, None)),
-    )
+    Flex::column()
+        .with_child(Label::new("Home Page"))
+        .with_spacer(5.0)
+        .with_child(
+            Button::new("Count")
+                .on_click(|ctx, _: &mut AppState, _| ctx.submit_command(COUNT, None)),
+        )
+        .center()
 }
 
 fn count_ui() -> impl Widget<CountState> {
     Flex::column()
+        .with_child(Label::new("\"Count\" Overlay"))
+        .with_spacer(5.0)
         .with_child(
             Button::dynamic(CountState::count_label)
                 .on_click(|_, state: &mut CountState, _| state.count += 1),
@@ -107,22 +113,15 @@ fn count_ui() -> impl Widget<CountState> {
 
 struct OverlayController;
 
-impl Controller<OverlayState, App> for OverlayController {
+impl Controller<OverlayState, Overlay> for OverlayController {
     fn event(
         &mut self,
-        child: &mut App,
+        child: &mut Overlay,
         ctx: &mut EventCtx,
         event: &Event,
         data: &mut OverlayState,
         env: &Env,
     ) {
-        //match event {
-        //Event::Command(cmd) if cmd.is(CLOSE) => {
-        //let main_state = cmd.get_unchecked(CLOSE).clone();
-        //*data = AppState::Count(main_state);
-        //}
-        //_ => {}
-        //}
         child.event(ctx, event, data, env)
     }
 }
